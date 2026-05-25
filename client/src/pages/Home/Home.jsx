@@ -328,7 +328,13 @@ const Home = ({ token: appToken, setToken: setAppToken }) => {
         formData.append("voice", item.file);
       });
 
-      const response = await fetch(`${API_URL}/api/predict`, {
+      // Build predict endpoint avoiding duplicate "/api" segments
+      const apiBase = String(API_URL || "http://localhost:5000").replace(/\/+$/g, "");
+      const predictEndpoint = apiBase.endsWith("/api")
+        ? `${apiBase}/predict`
+        : `${apiBase}/api/predict`;
+
+      const response = await fetch(predictEndpoint, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -486,7 +492,12 @@ const Home = ({ token: appToken, setToken: setAppToken }) => {
           const formData = new FormData();
           formData.append("file", file);
 
-          const resp = await fetch(`${API_URL}/api/transcribe`, {
+          const apiBase = String(API_URL || "http://localhost:5000").replace(/\/+$/g, "");
+          const transcribeEndpoint = apiBase.endsWith("/api")
+            ? `${apiBase}/transcribe`
+            : `${apiBase}/api/transcribe`;
+
+          const resp = await fetch(transcribeEndpoint, {
             method: "POST",
             body: formData,
           });
