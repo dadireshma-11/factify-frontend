@@ -1,9 +1,23 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
 import Home from "../pages/Home/Home";
 
 import "../styles/AppRoutes.css";
+
+// Lazy load pages for code splitting
+const About = lazy(() => import("../pages/About/About"));
+const Dashboard = lazy(() => import("../pages/Dashboard/Dashboard"));
+const Settings = lazy(() => import("../pages/Settings/Settings"));
+const Login = lazy(() => import("../pages/Login/Login"));
+const Register = lazy(() => import("../pages/Register/Register"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="page-section" style={{ textAlign: "center", padding: "2rem" }}>
+    <p>Loading...</p>
+  </div>
+);
 
 // Simple auth check
 const isAuthenticated = () => {
@@ -20,110 +34,76 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated() ? children : <Navigate to="/" replace />;
 };
 
-// Pages
-const About = () => (
-  <div className="page-section">
-    <h2>About</h2>
-    <p>This page explains the fake news detection platform.</p>
-  </div>
-);
-
-const Dashboard = () => (
-  <div className="page-section">
-    <h2>Dashboard</h2>
-    <p>This page shows insights, analysis history, and AI results.</p>
-  </div>
-);
-
-const Settings = () => (
-  <div className="page-section">
-    <h2>Settings</h2>
-    <p>This page lets users change preferences and theme behavior.</p>
-  </div>
-);
-
-const Login = () => (
-  <div className="page-section">
-    <h2>Login</h2>
-    <p>Users can log in to access saved analyses and account tools.</p>
-  </div>
-);
-
-const Register = () => (
-  <div className="page-section">
-    <h2>Register</h2>
-    <p>New users can create an account here.</p>
-  </div>
-);
-
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <div className="page">
         <Navbar />
 
-        <Routes>
-          {/* Default route */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            {/* Default route */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Protected pages */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected pages */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <About />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/about"
+              element={
+                <ProtectedRoute>
+                  <About />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Public pages (only when NOT logged in) */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
+            {/* Public pages (only when NOT logged in) */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
 
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            }
-          />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
 
-          {/* fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
-          
-        </Routes>
+            {/* fallback */}
+            <Route path="*" element={<Navigate to="/" />} />
+            
+          </Routes>
+        </Suspense>
       </div>
     </BrowserRouter>
   );
